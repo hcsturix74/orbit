@@ -8,60 +8,9 @@ All Orbit applications follow the [WSAPI](http://keplerproject.github.com/wsapi)
 work with Xavante, CGI and Fastcgi. It includes a launcher that makes it easy to launch
 a Xavante instance for development.
 
-## History
-
-* Version 2.2.1 (12/Jan/2014)
-    * bugfix release for Lua 5.1
-    * NOT 5.2 compliant
-    * documentation corrections and updates
-    * support for Wsapi 1.6 and other dependency modules that no longer use "module"
-    * additional orbit model datatypes: real, float, timestamp, numeric
-    * MIME type application/json included
-
-* Version 2.2.0 (31/Mar/2010)
-    * Reparse response to resume the dispatcher
-    * better parser for orbit.model conditions, fixes parsing bugs
-    * `orbit` launcher has parameters to control logging and port
-    * `op.cgi`/`op.fcgi` launchers have the same parameters as `wsapi.cgi`/`wsapi.fcgi`
-    * Optional [Sinatra](http://www.sinatrarb.com/)-like route parser, using LPEG
-    * Pluggable route parsers (route patterns can be strings or objects that answer to :match)
-
-* Version 2.1.0 (29/Oct/2009)
-    * better decoupling of orbit and orbit.model
-    * support for anything with a match method as patterns
-    * new options for orbit.model finders: distinct, fields
-    * count option for orbit.model now limits number of rows in the SQL
-    * logging of queries in orbit.model
-    * overhaul of the "orbit" script: better options, --help, sets application path
-    * content_type method in the web object to set content type
-    * support for PUT and DELETE (methods `dispatch_put` and `dispatch_delete`)
-    * orbit.model.recycle(*conn_builder*, *timeout*) function, to make a connection that
-      automatically reopens after a certain time
-    * more samples in the samples folder
-    * added a "higher-order" $if to Orbit Pages
-
-* Version 2.0.2 (10/Mar/2009)
-    * url-decodes path captures (suggested by Ignacio Burgueño on a Jul 24 email to the Kepler list)
-    * added tutorial and new examples
-    * fixed escape.string
-    * web:delete_cookie receives a path parameter in order to correctly remove the cookie. Bug report and patch by Ignacio Burgueño
-    * stripping UTF-8 BOM from templates read from disk
-    * removing SoLazer files in order to make the Orbit package smaller
-    * added alternate name for integer (int)
-    * better error reporting for missing escape and convert functions
-    * removed toboolean
-    * fixed bugs 13451 and 25418: setting status 500 on application errors not throwing an error if file not exists when invalidating cache
-
-* Version 2.0.1 (10/Jun/2008): bug-fix release, fixed bug in Orbit pages' redirect function (thanks for
-Ignacio Burgueño for finding the bug)
-
-* Version 2.0 (06/Jun/2008): Complete rewrite of Orbit
-
-* Version 1.0: Initial release, obsolete
-
 ## Download and Installation
 
-The easiest way to download and install Orbit is via [LuaRocks](http://luarocks.org). You 
+The easiest way to download and install Orbit is via [LuaRocks](http://luarocks.org). You
 can install Orbit with a simple `luarocks install orbit`. Go to the path where LuaRocks
 put Orbit to see the sample apps and this documentation. LuaRocks will automatically fetch
 and install any dependencies you don't already have.
@@ -74,7 +23,7 @@ size because it embeds the Sproutcore JavaScript framework.
 
 Below is a very simple Orbit application:
 
-<pre>
+<pre class="example">
     #!/usr/bin/env wsapi.cgi
 
     local orbit = require "orbit"
@@ -131,13 +80,13 @@ Below is a very simple Orbit application:
     function render_hello()
        return p.hello"Hello World!"
     end
-    
+
     function render_index()
        return render_layout(render_hello())
     end
 
     function render_say(web, name)
-       return render_layout(render_hello() .. 
+       return render_layout(render_hello() ..
          p.hello((web.input.greeting or "Hello ") .. name .. "!"))
     end
 
@@ -151,21 +100,21 @@ the first is to run `wsapi` in the same directory that you saved the file and po
 or run `orbit hello.lua` in the same directory that you saved the file and point your browser to `http://localhost:8080/`. Now try
 appending `index`, `say/foo`, and `say/foo?message=bar` to the URL.
 
-The example uses Orbit's built-in html generation, but you are free to use any method of generating HTML. 
+The example uses Orbit's built-in html generation, but you are free to use any method of generating HTML.
 One of Orbit's sample applications uses the [Cosmo](http://cosmo.luaforge.net) template library, for instance.
 
 ## OR Mapping
 
-Orbit also includes a basic OR mapper that currently only works with 
+Orbit also includes a basic OR mapper that currently only works with
 [LuaSQL's](http://github.com/keplerproject/luasql) SQLite3 and MySQL drivers. The mapper provides
 dynamic find methods, a la Rails' ActiveRecord (find\_by\_field1\_and\_field2{val1, val2}),
-as well as templates for conditions (find_by("field1 = ? or field1 = ?", { val1, val2 })). 
+as well as templates for conditions (find_by("field1 = ? or field1 = ?", { val1, val2 })).
 The sample applications use this mapper.
 
-A nice side-effect of the Orbit application model is that we get an "application console" 
+A nice side-effect of the Orbit application model is that we get an "application console"
 for free. For example, with the blog example we can add a new post like this:
 
-<pre>
+<pre class="example">
     $ lua -l luarocks.require -i blog.lua
     > p = blog.posts:new()
     > p.title = "New Post"
@@ -174,9 +123,72 @@ for free. For example, with the blog example we can add a new post like this:
     > p:save()
 </pre>
 
-You can also update or delete any of the model items right from your console, just fetch 
-them from the database, change what you want and call `save()` 
+You can also update or delete any of the model items right from your console, just fetch
+them from the database, change what you want and call `save()`
 (or `delete()` if you want to remove it).
+
+## History
+
+* Version 2.2.4 (22/Jul/2015)
+	* Fixed a cursor leak when using Postgres and inserting.
+    * NOT 5.2 compliant
+
+* Version 2.2.3 (16/Jul/2015)
+	* Fixed model:save() when using Postgres. The 'id' was being set to "NULL" and that violates the primary key constraint.
+    * NOT 5.2 compliant
+
+* Version 2.2.2 (10/Sep/2014)
+	* Added the ability to specify the offset in a model. This is useful for implimenting pagination.
+    * NOT 5.2 compliant
+
+* Version 2.2.1 (12/Jan/2014)
+    * bugfix release for Lua 5.1
+    * NOT 5.2 compliant
+    * documentation corrections and updates
+    * support for Wsapi 1.6 and other dependency modules that no longer use "module"
+    * additional orbit model datatypes: real, float, timestamp, numeric
+    * MIME type application/json included
+
+* Version 2.2.0 (31/Mar/2010)
+    * Reparse response to resume the dispatcher
+    * better parser for orbit.model conditions, fixes parsing bugs
+    * `orbit` launcher has parameters to control logging and port
+    * `op.cgi`/`op.fcgi` launchers have the same parameters as `wsapi.cgi`/`wsapi.fcgi`
+    * Optional [Sinatra](http://www.sinatrarb.com/)-like route parser, using LPEG
+    * Pluggable route parsers (route patterns can be strings or objects that answer to :match)
+
+* Version 2.1.0 (29/Oct/2009)
+    * better decoupling of orbit and orbit.model
+    * support for anything with a match method as patterns
+    * new options for orbit.model finders: distinct, fields
+    * count option for orbit.model now limits number of rows in the SQL
+    * logging of queries in orbit.model
+    * overhaul of the "orbit" script: better options, --help, sets application path
+    * content_type method in the web object to set content type
+    * support for PUT and DELETE (methods `dispatch_put` and `dispatch_delete`)
+    * orbit.model.recycle(*conn_builder*, *timeout*) function, to make a connection that
+      automatically reopens after a certain time
+    * more samples in the samples folder
+    * added a "higher-order" $if to Orbit Pages
+
+* Version 2.0.2 (10/Mar/2009)
+    * url-decodes path captures (suggested by Ignacio Burgueño on a Jul 24 email to the Kepler list)
+    * added tutorial and new examples
+    * fixed escape.string
+    * web:delete_cookie receives a path parameter in order to correctly remove the cookie. Bug report and patch by Ignacio Burgueño
+    * stripping UTF-8 BOM from templates read from disk
+    * removing SoLazer files in order to make the Orbit package smaller
+    * added alternate name for integer (int)
+    * better error reporting for missing escape and convert functions
+    * removed toboolean
+    * fixed bugs 13451 and 25418: setting status 500 on application errors not throwing an error if file not exists when invalidating cache
+
+* Version 2.0.1 (10/Jun/2008): bug-fix release, fixed bug in Orbit pages' redirect function (thanks for
+Ignacio Burgueño for finding the bug)
+
+* Version 2.0 (06/Jun/2008): Complete rewrite of Orbit
+
+* Version 1.0: Initial release, obsolete
 
 ## Credits
 
@@ -188,5 +200,5 @@ and is maintained by Fabio Mascarenhas.
 For more information please [contact us](mailto:info-NO-SPAM-THANKS@keplerproject.org).
 Comments are welcome!
 
-You can also reach us and other developers and users on the Kepler Project 
-[mailing list](https://groups.google.com/forum/#!forum/kepler-project). 
+You can also reach us and other developers and users on the Kepler Project
+[mailing list](https://groups.google.com/forum/#!forum/kepler-project).
